@@ -1,6 +1,6 @@
 # Mage2 Module Outshifter PluginConnector
 
-    ``outshifter/module-pluginconnector``
+``outshifter/pluginconnector``
 
  - [Main Functionalities](#markdown-header-main-functionalities)
  - [Installation](#markdown-header-installation)
