@@ -1,6 +1,6 @@
 <?php
 
-namespace Outshifter\PluginConnector\Helper;
+namespace Outshifter\Outshifter\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Outshifter\PluginConnector\Ui\DataProvider\Product;
+namespace Outshifter\Outshifter\Ui\DataProvider\Product;
 
 use Magento\Ui\DataProvider\AddFilterToCollectionInterface;
 use Magento\Framework\Data\Collection;

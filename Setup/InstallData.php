@@ -1,5 +1,5 @@
 <?php
-namespace Outshifter\PluginConnector\Setup;
+namespace Outshifter\Outshifter\Setup;
 
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;

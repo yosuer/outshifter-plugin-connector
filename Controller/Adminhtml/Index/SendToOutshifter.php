@@ -1,6 +1,6 @@
 <?php
 
-namespace Outshifter\PluginConnector\Controller\Adminhtml\Index;
+namespace Outshifter\Outshifter\Controller\Adminhtml\Index;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;

@@ -1,6 +1,6 @@
-# Mage2 Module Outshifter PluginConnector
+# Mage2 Module Outshifter Connector
 
-``outshifter/pluginconnector``
+``outshifter/connector``
 
  - [Main Functionalities](#markdown-header-main-functionalities)
  - [Installation](#markdown-header-installation)
@@ -10,7 +10,7 @@
 
 
 ## Main Functionalities
-Outshifter Plugin Connector
+Outshifter Connector
 
 ## Installation
 \* = in production please use the `--keep-generated` option
@@ -18,7 +18,7 @@ Outshifter Plugin Connector
 ### Type 1: Zip file
 
  - Unzip the zip file in `app/code/Outshifter`
- - Enable the module by running `php bin/magento module:enable Outshifter_PluginConnector`
+ - Enable the module by running `php bin/magento module:enable outshifter/connector`
  - Apply database updates by running `php bin/magento setup:upgrade`\*
  - Compile in dev mode `php bin/magento setup:di:compile`
  - Deploy in dev mode `php bin/magento setup:static-content:deploy`
@@ -31,8 +31,8 @@ Outshifter Plugin Connector
     - public repository `packagist.org`
     - public github repository as vcs
  - Add the composer repository to the configuration by running `composer config repositories.repo.magento.com composer https://repo.magento.com/`
- - Install the module composer by running `composer require outshifter/pluginconnector`
- - enable the module by running `php bin/magento module:enable Outshifter_PluginConnector`
+ - Install the module composer by running `composer require outshifter/outshifter`
+ - enable the module by running `php bin/magento module:enable Outshifter_Outshifter`
  - apply database updates by running `php bin/magento setup:upgrade`\*
  - Flush the cache by running `php bin/magento cache:flush`
 

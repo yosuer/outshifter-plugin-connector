@@ -6,7 +6,7 @@
         <resource id="Magento_Backend::stores">
           <resource id="Magento_Backend::stores_settings">
             <resource id="Magento_Config::config">
-              <resource id="Outshifter_PluginConnector::config" title="Outshifter" />
+              <resource id="Outshifter_Outshifter::config" title="Outshifter" />
             </resource>
           </resource>
         </resource>

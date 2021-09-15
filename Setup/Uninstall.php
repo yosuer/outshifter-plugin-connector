@@ -1,5 +1,5 @@
 <?php
-namespace Outshifter\PluginConnector\Setup;
+namespace Outshifter\Outshifter\Setup;
 
 use Magento\Framework\Setup\UninstallInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;

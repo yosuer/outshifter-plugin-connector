@@ -1,9 +1,6 @@
 <?php
-use Magento\Framework\Component\ComponentRegistrar;
-
-ComponentRegistrar::register(
-  ComponentRegistrar::MODULE,
-  'Outshifter_PluginConnector',
-  __DIR__
+\Magento\Framework\Component\ComponentRegistrar::register(
+    \Magento\Framework\Component\ComponentRegistrar::MODULE,
+    'Outshifter_Outshifter',
+    __DIR__
 );
-

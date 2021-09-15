@@ -1,6 +1,6 @@
 {
-  "name": "outshifter/pluginconnector",
-  "description": "Outshifter Plugin Connector",
+  "name": "outshifter/connector",
+  "description": "Outshifter Connector",
   "type": "magento2-module",
   "license": "proprietary",
   "version": "1.0.0",
@@ -16,7 +16,7 @@
       "registration.php"
     ],
     "psr-4": {
-      "Outshifter\\PluginConnector\\": ""
+      "Outshifter\\Outshifter\\": ""
     }
   }
 }
