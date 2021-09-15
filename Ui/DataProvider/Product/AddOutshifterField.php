@@ -5,7 +5,7 @@ namespace Outshifter\Outshifter\Ui\DataProvider\Product;
 use Magento\Ui\DataProvider\AddFieldToCollectionInterface;
 use Magento\Framework\Data\Collection;
 
-class AddOutshifterField implements AddFieldToCollectionInterface
+class Addoutshifterfield implements AddFieldToCollectionInterface
     {
         public function addField(Collection $collection, $field, $alias = null) {
             $collection->joinField(
