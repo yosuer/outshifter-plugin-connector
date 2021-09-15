@@ -3,10 +3,10 @@
   <type name="Magento\Catalog\Ui\DataProvider\Product\ProductDataProvider">
     <arguments>
       <argument name="addFieldStrategies" xsi:type="array">
-        <item name="outshifter_exported" xsi:type="object">Outshifter_PluginConnector\Ui\DataProvider\Product\AddOutshifterExportedField</item>
+        <item name="outshifter_exported" xsi:type="object">outshifter\pluginconnector\Ui\DataProvider\Product\AddOutshifterExportedField</item>
       </argument>
       <argument name="addFilterStrategies" xsi:type="array">
-        <item name="outshifter_exported" xsi:type="object">Outshifter_PluginConnector\Ui\DataProvider\Product\AddOutshifterExportedFilter</item>
+        <item name="outshifter_exported" xsi:type="object">outshifter_pluginconnector\Ui\DataProvider\Product\AddOutshifterExportedFilter</item>
       </argument>
     </arguments>
   </type>
