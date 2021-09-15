@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+  <listingToolbar name="listing_top">
+    <massaction name="listing_massaction" component="Magento_Ui/js/grid/tree-massactions">
+      <action name="sendtooutshifter">
+        <settings>
+          <url path="outshifter/index/sendtooutshifter" />
+          <type>sendtooutshifter</type>
+          <label translate="false">Send to outshifter</label>
+        </settings>
+      </action>
+      <action name="removeinoutshifter">
+        <settings>
+          <url path="outshifter/index/removeinoutshifter" />
+          <type>removeinoutshifter</type>
+          <label translate="false">Remove in outshifter</label>
+        </settings>
+      </action>
+    </massaction>
+    <paging name="listing_paging" />
+  </listingToolbar>
+  <columns name="product_columns">
+    <column name="outshifter_exported" component="Magento_Ui/js/grid/columns/select" sortOrder="76">
+      <settings>
+        <addField>true</addField>
+        <options class="Magento\Config\Model\Config\Source\Yesno" />
+        <filter>select</filter>
+        <dataType>select</dataType>
+        <sortable>false</sortable>
+        <label translate="true">In Outshifter</label>
+      </settings>
+    </column>
+  </columns>
+</listing>

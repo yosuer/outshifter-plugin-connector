@@ -1,0 +1,7 @@
+<integrations>
+  <integration name="Outshifter">
+    <email>support@outshifter.com</email>
+    <endpoint_url>https://03d1-186-22-17-73.ngrok.io/magento/auth/callback</endpoint_url>
+    <identity_link_url>https://6b9e-186-22-17-73.ngrok.io</identity_link_url>
+  </integration>
+</integrations>
