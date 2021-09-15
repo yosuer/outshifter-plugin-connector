@@ -3,17 +3,14 @@
   "description": "Outshifter Plugin Connector",
   "type": "magento2-module",
   "license": "proprietary",
+  "version": "1.0.0",
   "authors": [
     {
       "name": "Outshifter",
       "email": "support@outshifter.com"
     }
   ],
-  "require": {
-    "php": "~7.2.0||~7.3.0||~7.4.0",
-    "magento/framework": "~100.0.4",
-    "magento/module-integration": "~100.0.4"
-  },
+  "require": {},
   "autoload": {
     "files": [
       "registration.php"
