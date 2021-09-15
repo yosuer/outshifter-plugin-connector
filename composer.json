@@ -1,5 +1,5 @@
 {
-  "name": "outshifter/module-pluginconnector",
+  "name": "outshifter/pluginconnector",
   "description": "Outshifter Plugin Connector",
   "type": "magento2-module",
   "license": "proprietary",
@@ -11,7 +11,7 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "php": "~5.5.0|~5.6.0|~7.0.0",
+    "php": "~7.0.0",
     "magento/framework": "2.0.0",
     "magento/module-integration": "2.0.0"
   },

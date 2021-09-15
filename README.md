@@ -31,7 +31,7 @@ Outshifter Plugin Connector
     - public repository `packagist.org`
     - public github repository as vcs
  - Add the composer repository to the configuration by running `composer config repositories.repo.magento.com composer https://repo.magento.com/`
- - Install the module composer by running `composer require outshifter/module-pluginconnector`
+ - Install the module composer by running `composer require outshifter/pluginconnector`
  - enable the module by running `php bin/magento module:enable Outshifter_PluginConnector`
  - apply database updates by running `php bin/magento setup:upgrade`\*
  - Flush the cache by running `php bin/magento cache:flush`
