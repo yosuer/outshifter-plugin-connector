@@ -26,16 +26,15 @@ Outshifter Connector
 
 ### Type 2: Composer
 
- - Make the module available in a composer repository for example:
-    - private repository `repo.magento.com`
-    - public repository `packagist.org`
-    - public github repository as vcs
- - Add the composer repository to the configuration by running `composer config repositories.repo.magento.com composer https://repo.magento.com/`
- - Install the module composer by running `composer require outshifter/outshifter`
- - enable the module by running `php bin/magento module:enable Outshifter_Outshifter`
- - apply database updates by running `php bin/magento setup:upgrade`\*
- - Flush the cache by running `php bin/magento cache:flush`
-
+```
+composer require outshifter/connector
+php bin/magento maintenance:enable
+php bin/magento setup:upgrade
+php bin/magento setup:di:compile
+php bin/magento setup:static-content:deploy
+php bin/magento maintenance:disable
+php bin/magento cache:flush
+```
 
 ## Configuration
 
