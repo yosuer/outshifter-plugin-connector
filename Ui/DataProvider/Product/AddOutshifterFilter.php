@@ -5,7 +5,7 @@ namespace Outshifter\PluginConnector\Ui\DataProvider\Product;
 use Magento\Ui\DataProvider\AddFilterToCollectionInterface;
 use Magento\Framework\Data\Collection;
 
-class AddOutshifterExportedFilter implements AddFilterToCollectionInterface 
+class AddOutshifterFilter implements AddFilterToCollectionInterface 
 { 
     public function addFilter(Collection $collection, $field, $condition = null) 
     { 
