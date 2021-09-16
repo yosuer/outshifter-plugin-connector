@@ -4,12 +4,13 @@
     <arguments>
       <argument name="addFieldStrategies" xsi:type="array">
         <item name="outshifter_exported" xsi:type="object">
-          Outshifter\Outshifter\Ui\DataProvider\Product\Addoutshifterfield
+          Outshifter\Outshifter\Ui\DataProvider\Product\AddOutshifterField
         </item>
+        <argument name="name" xsi:type="string">new_tag_form_data_source</argument>
       </argument>
       <argument name="addFilterStrategies" xsi:type="array">
         <item name="outshifter_exported" xsi:type="object">
-          Outshifter\Outshifter\Ui\DataProvider\Product\Addoutshifterfilter
+          Outshifter\Outshifter\Ui\DataProvider\Product\AddOutshifterFilter
         </item>
       </argument>
     </arguments>
