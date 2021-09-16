@@ -37,10 +37,22 @@ php bin/magento maintenance:disable
 php bin/magento cache:flush
 ```
 
-## Configuration
+## To Remove
+
+```
+composer require outshifter/connector
+php bin/magento maintenance:enable
+php bin/magento module:enable Outshifter_Outshifter
+php bin/magento setup:upgrade
+php bin/magento setup:di:compile
+php bin/magento setup:static-content:deploy
+php bin/magento maintenance:disable
+php bin/magento cache:flush
+
+rm -rf var/cache/ var/generation/ var/page_cache/ var/view_preprocessed/ var/di/ generated/* var/generation/*
 
 
-
+```
 
 ## Specifications
 
