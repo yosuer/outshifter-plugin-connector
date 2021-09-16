@@ -57,10 +57,11 @@ class InstallData implements InstallDataInterface
               'required' => false,
               'sort_order' => 50,
               'global' => ScopedAttributeInterface::SCOPE_GLOBAL,
-              'is_used_in_grid' => false,
+              'is_used_in_grid' => true,
               'is_visible_in_grid' => false,
-              'is_filterable_in_grid' => false,
+              'is_filterable_in_grid' => true,
               'visible' => true,
+              'user_defined' => false,
               'is_html_allowed_on_front' => false,
               'visible_on_front' => false
           ]
