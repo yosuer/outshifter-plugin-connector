@@ -50,7 +50,7 @@ php bin/magento maintenance:disable
 php bin/magento cache:flush
 
 rm -rf var/cache/ var/generation/ var/page_cache/ var/view_preprocessed/ var/di/ generated/* var/generation/*
-
+sudo chown -R . bitnami:daemon
 
 ```
 
