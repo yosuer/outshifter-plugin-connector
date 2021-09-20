@@ -94,7 +94,7 @@ class SendToOutshifter extends Action
             $productDataObject->setData('outshifter_exported', true);
             $this->productRepository->save($productDataObject);
         }
-        $this->messageManager->addSuccess(__('A total of %1 product(s) have been exported to outsfhiter**.', count($productIds)));
+        $this->messageManager->addSuccess(__('A total of %1 product(s) have been exported to outsfhiter******.', count($productIds)));
         
         $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
         return $resultRedirect->setPath('catalog/product/index');
