@@ -10,6 +10,7 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Backend\Model\View\Result\Redirect;
 use Outshifter\Outshifter\Helper\Data;
+use Outshifter\Outshifter\Logger\Logger;
 
 class SendToOutshifter extends Action
 {
@@ -34,6 +35,11 @@ class SendToOutshifter extends Action
      */
     protected $helper;
 
+    /**
+     * @var Logger
+     */
+    protected $_logger;
+
 
     /**
      * @param Context $context
@@ -47,34 +53,35 @@ class SendToOutshifter extends Action
         Filter $filter,
         CollectionFactory $collectionFactory,
         ProductRepositoryInterface $productRepository,
-        Data $helper)
+        Data $helper,
+        Logger $logger)
     {
         $this->filter = $filter;
         $this->collectionFactory = $collectionFactory;
         $this->productRepository = $productRepository;
         $this->helper = $helper;
+        $this->_logger = $logger;
         parent::__construct($context);
     }
-
-
 
     /**
      * @return Redirect
      */
     public function execute()
     {
-        $collection = $this->filter->getCollection($this->collectionFactory->create());
-        $productIds = $collection->getAllIds();
-        $apiKey = $this->helper->getApiKey();
-        if ($apiKey) {
+      $this->_logger->info('I did something');
+      $collection = $this->filter->getCollection($this->collectionFactory->create());
+      $productIds = $collection->getAllIds();
+      $apiKey = $this->helper->getApiKey();
+      if ($apiKey) {
           foreach ($productIds as $productId)
           {
               $productDataObject = $this->productRepository->getById($productId);
-  
+
               $postData = array(
                 'title' => 'A new product'
               );
-  
+
               $ch = curl_init('https://03d1-186-22-17-73.ngrok.io/api/products');
               curl_setopt_array($ch, array(
                 CURLOPT_POST => TRUE,
@@ -89,18 +96,17 @@ class SendToOutshifter extends Action
               if($response === FALSE){
                 die(curl_error($ch));
               }
-  
+
               curl_close($ch);
-  
+
               $productDataObject->setData('outshifter_exported', true);
               $this->productRepository->save($productDataObject);
           }
           $this->messageManager->addSuccess(__('A total of %1 product(s) have been exported to outsfhiter******.', count($productIds)));
-        } else {
+      } else {
           $this->messageManager->addError(__('You should config your outshifter api key in Store -> Settings -> Outshifter'));
-        }
-        
-        $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
-        return $resultRedirect->setPath('catalog/product/index');
+      }
+      $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+      return $resultRedirect->setPath('catalog/product/index');
     }
 }
