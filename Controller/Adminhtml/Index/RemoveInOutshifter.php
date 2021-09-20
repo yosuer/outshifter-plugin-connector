@@ -69,7 +69,7 @@ class RemoveInOutshifter extends Action
 
             $ch = curl_init('https://03d1-186-22-17-73.ngrok.io/magento/products/'.$productId);
             curl_setopt_array($ch, array(
-              CURLOPT_POST => TRUE,
+              CURLOPT_CUSTOMREQUEST => "DELETE",
               CURLOPT_RETURNTRANSFER => TRUE,
               CURLOPT_HTTPHEADER => array(
                   'authorization: '.$apiKey,
