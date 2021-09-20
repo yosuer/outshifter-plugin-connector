@@ -82,7 +82,7 @@ class SendToOutshifter extends Action
                 'title' => $product->getName(),
                 'origin' => 'MAGENTO',
                 'originId' => $productId,
-                'sku' => $product->setSku()
+                'sku' => $product->getSku()
               );
 
               $ch = curl_init('https://03d1-186-22-17-73.ngrok.io/api/products');
