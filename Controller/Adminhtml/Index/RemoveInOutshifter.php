@@ -62,7 +62,6 @@ class RemoveInOutshifter extends Action
     {
         $collection = $this->filter->getCollection($this->collectionFactory->create());
         $productIds = $collection->getAllIds();
-        $this->_logger->info('[RemoveFromOutshifter] init by '.implode(",", $productIds));
         $apiKey = $this->helper->getApiKey();
         foreach ($productIds as $productId)
         {
