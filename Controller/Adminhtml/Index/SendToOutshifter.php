@@ -71,15 +71,18 @@ class SendToOutshifter extends Action
     {
       $collection = $this->filter->getCollection($this->collectionFactory->create());
       $productIds = $collection->getAllIds();
-      $this->_logger->info('[SendToOutshifter.execute] init by '.implode("|", $productIds));
+      $this->_logger->info('[SendToOutshifter] init by '.implode(",", $productIds));
       $apiKey = $this->helper->getApiKey();
       if ($apiKey) {
           foreach ($productIds as $productId)
           {
-              $productDataObject = $this->productRepository->getById($productId);
+              $product = $this->productRepository->getById($productId);
 
               $postData = array(
-                'title' => 'A new product'
+                'title' => $product->getName(),
+                'origin' => 'MAGENTO',
+                'originId' => $productId,
+                'sku' => $product->setSku()
               );
 
               $ch = curl_init('https://03d1-186-22-17-73.ngrok.io/api/products');
@@ -87,7 +90,7 @@ class SendToOutshifter extends Action
                 CURLOPT_POST => TRUE,
                 CURLOPT_RETURNTRANSFER => TRUE,
                 CURLOPT_HTTPHEADER => array(
-                    'Authorization: '.$apiKey,
+                    'authorization: '.$apiKey,
                     'Content-Type: application/json'
                 ),
                 CURLOPT_POSTFIELDS => json_encode($postData)
@@ -98,18 +101,18 @@ class SendToOutshifter extends Action
                 die(curl_error($ch));
               }
               if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 401) {
-                $this->messageManager->addError(__('Please review your outshifter api key in Store -> Settings -> Outshifter'));
+                $this->messageManager->addError(__('Please review your outshifter api key in Stores -> Configuration -> Outshifter'));
                 break;
               }
 
               curl_close($ch);
 
-              $productDataObject->setData('outshifter_exported', true);
-              $this->productRepository->save($productDataObject);
+              $product->setData('outshifter_exported', true);
+              $this->productRepository->save($product);
               $this->messageManager->addSuccess(__('The product %1 was exported to outshifter', $productId));
           }
       } else {
-          $this->messageManager->addError(__('You should config your outshifter api key in Store -> Settings -> Outshifter'));
+          $this->messageManager->addError(__('You should config your outshifter api key in Stores -> Configuration -> Outshifter'));
       }
       $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
       return $resultRedirect->setPath('catalog/product/index');
