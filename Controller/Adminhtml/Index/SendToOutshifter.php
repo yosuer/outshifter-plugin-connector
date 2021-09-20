@@ -69,9 +69,9 @@ class SendToOutshifter extends Action
      */
     public function execute()
     {
-      $this->_logger->info('I did something');
       $collection = $this->filter->getCollection($this->collectionFactory->create());
       $productIds = $collection->getAllIds();
+      $this->_logger->info('[SendToOutshifter.execute] init by '.implode("|", $productIds));
       $apiKey = $this->helper->getApiKey();
       if ($apiKey) {
           foreach ($productIds as $productId)
@@ -94,20 +94,20 @@ class SendToOutshifter extends Action
               ));
               $response = curl_exec($ch);
               if($response === FALSE) {
-                $this->messageManager->addError(__('Connection problem, try again in a moment'));
+                $this->messageManager->addError(__('Connection problem exporting product %1, try again in a moment', $productId));
                 die(curl_error($ch));
               }
               if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 401) {
                 $this->messageManager->addError(__('Please review your outshifter api key in Store -> Settings -> Outshifter'));
-                die();
+                break;
               }
 
               curl_close($ch);
 
               $productDataObject->setData('outshifter_exported', true);
               $this->productRepository->save($productDataObject);
+              $this->messageManager->addSuccess(__('The product %1 was exported to outshifter', $productId));
           }
-          $this->messageManager->addSuccess(__('A total of %1 product(s) have been exported to outsfhiter******.', count($productIds)));
       } else {
           $this->messageManager->addError(__('You should config your outshifter api key in Store -> Settings -> Outshifter'));
       }
