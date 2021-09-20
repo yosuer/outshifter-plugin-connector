@@ -85,7 +85,7 @@ class SendToOutshifter extends Action
                 'sku' => $product->getSku()
               );
 
-              $ch = curl_init('https://03d1-186-22-17-73.ngrok.io/api/products');
+              $ch = curl_init('https://03d1-186-22-17-73.ngrok.io/magento/products');
               curl_setopt_array($ch, array(
                 CURLOPT_POST => TRUE,
                 CURLOPT_RETURNTRANSFER => TRUE,
