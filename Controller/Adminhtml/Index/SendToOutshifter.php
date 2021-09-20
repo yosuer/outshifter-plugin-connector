@@ -93,8 +93,13 @@ class SendToOutshifter extends Action
                 CURLOPT_POSTFIELDS => json_encode($postData)
               ));
               $response = curl_exec($ch);
-              if($response === FALSE){
+              if($response === FALSE) {
+                $this->messageManager->addError(__('Connection problem, try again in a moment'));
                 die(curl_error($ch));
+              }
+              if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 401) {
+                $this->messageManager->addError(__('Please review your outshifter api key in Store -> Settings -> Outshifter'));
+                die();
               }
 
               curl_close($ch);
