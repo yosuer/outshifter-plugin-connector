@@ -19,3 +19,5 @@
 .env.local
 .env.local-prod
 package-lock.json
+
+vendor

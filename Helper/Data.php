@@ -41,7 +41,7 @@ class Data extends AbstractHelper
     /*
      * @return string
      */
-    public function getSecret($scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT)
+    public function getApiKey($scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT)
     {
         $secret = $this->scopeConfig->getValue(
             'outshifter/general/apikey',
