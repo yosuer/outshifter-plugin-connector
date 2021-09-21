@@ -10,6 +10,7 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\CatalogInventory\Api\StockStateInterface;
 use Outshifter\Outshifter\Helper\Data;
 use Outshifter\Outshifter\Logger\Logger;
 
@@ -34,7 +35,7 @@ class SendToOutshifter extends Action
     /**
      * @var ProductRepositoryInterface
      */
-    protected $_storeManager;
+    protected $storeManager;
 
     /**
      * @var Data
@@ -53,6 +54,7 @@ class SendToOutshifter extends Action
      * @param CollectionFactory $collectionFactory
      * @param ProductRepositoryInterface $productRepository
      * @param StoreManagerInterface $storeManager
+     * @param StockStateInterface $stockState
      * @param Data $helper
      * @param Logger $logger
      */
@@ -62,14 +64,16 @@ class SendToOutshifter extends Action
         CollectionFactory $collectionFactory,
         ProductRepositoryInterface $productRepository,
         StoreManagerInterface $storeManager,
+        StockStateInterface $stockState,
         Data $helper,
         Logger $logger)
     {
         $this->filter = $filter;
         $this->collectionFactory = $collectionFactory;
         $this->productRepository = $productRepository;
+        $this->storeManager = $storeManager;
+        $this->stockState = $stockState;
         $this->helper = $helper;
-        $this->_storeManager = $storeManager;
         $this->_logger = $logger;
         parent::__construct($context);
     }
@@ -83,21 +87,25 @@ class SendToOutshifter extends Action
       $productIds = $collection->getAllIds();
       $this->_logger->info('[SendToOutshifter] init by '.implode(",", $productIds));
       $apiKey = $this->helper->getApiKey();
-      $currency = $this->_storeManager->getStore()->getCurrentCurrency()->getCode();
+      $currency = $this->storeManager->getStore()->getCurrentCurrency()->getCode();
       if ($apiKey) {
-          foreach ($productIds as $productId)
+        foreach ($productIds as $productId)
           {
               $product = $this->productRepository->getById($productId);
-
+              $quantity = $this->stockState->getStockQty($productId, $product->getStore()->getWebsiteId());
               $postData = array(
                 'title' => $product->getName(),
                 'origin' => 'MAGENTO',
                 'originId' => $productId,
                 'sku' => $product->getSku(),
+                "quantity" => $quantity,
                 "publicPrice" => array(
                   "amount" => $product->getPrice(),
                   "currency" => $currency
                 ),
+                "barcode" => "",
+                "weight" => $product->getWeight(),
+                "description" => $product->getDescription()
               );
 
               $ch = curl_init('https://03d1-186-22-17-73.ngrok.io/magento/products');
