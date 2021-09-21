@@ -11,6 +11,7 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\CatalogInventory\Api\StockStateInterface;
+use Magento\Catalog\Model\ProductFactory;
 use Outshifter\Outshifter\Helper\Data;
 use Outshifter\Outshifter\Logger\Logger;
 
@@ -31,6 +32,11 @@ class SendToOutshifter extends Action
      * @var ProductRepositoryInterface
      */
     protected $productRepository;
+
+    /**
+     * @var ProductFactory
+     */
+    protected $productLoader;
 
     /**
      * @var ProductRepositoryInterface
@@ -55,6 +61,7 @@ class SendToOutshifter extends Action
      * @param ProductRepositoryInterface $productRepository
      * @param StoreManagerInterface $storeManager
      * @param StockStateInterface $stockState
+     * @param ProductFactory $productLoader
      * @param Data $helper
      * @param Logger $logger
      */
@@ -65,6 +72,7 @@ class SendToOutshifter extends Action
         ProductRepositoryInterface $productRepository,
         StoreManagerInterface $storeManager,
         StockStateInterface $stockState,
+        ProductFactory $productLoader,
         Data $helper,
         Logger $logger)
     {
@@ -73,6 +81,7 @@ class SendToOutshifter extends Action
         $this->productRepository = $productRepository;
         $this->storeManager = $storeManager;
         $this->stockState = $stockState;
+        $this->productLoader = $productLoader;
         $this->helper = $helper;
         $this->_logger = $logger;
         parent::__construct($context);
@@ -91,7 +100,7 @@ class SendToOutshifter extends Action
       if ($apiKey) {
         foreach ($productIds as $productId)
           {
-              $product = $this->productRepository->getById($productId);
+              $product = $this->productLoader->create()->load($productId);
               $quantity = $this->stockState->getStockQty($productId, $product->getStore()->getWebsiteId());
               $postData = array(
                 'title' => $product->getName(),
