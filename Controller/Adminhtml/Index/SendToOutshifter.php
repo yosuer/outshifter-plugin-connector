@@ -9,6 +9,7 @@ use Magento\Ui\Component\MassAction\Filter;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Backend\Model\View\Result\Redirect;
+use Magento\Store\Model\StoreManagerInterface;
 use Outshifter\Outshifter\Helper\Data;
 use Outshifter\Outshifter\Logger\Logger;
 
@@ -31,6 +32,11 @@ class SendToOutshifter extends Action
     protected $productRepository;
 
     /**
+     * @var ProductRepositoryInterface
+     */
+    protected $_storeManager;
+
+    /**
      * @var Data
      */
     protected $helper;
@@ -46,13 +52,16 @@ class SendToOutshifter extends Action
      * @param Filter $filter
      * @param CollectionFactory $collectionFactory
      * @param ProductRepositoryInterface $productRepository
+     * @param StoreManagerInterface $storeManager
      * @param Data $helper
+     * @param Logger $logger
      */
     public function __construct(
         Context $context,
         Filter $filter,
         CollectionFactory $collectionFactory,
         ProductRepositoryInterface $productRepository,
+        StoreManagerInterface $storeManager,
         Data $helper,
         Logger $logger)
     {
@@ -60,6 +69,7 @@ class SendToOutshifter extends Action
         $this->collectionFactory = $collectionFactory;
         $this->productRepository = $productRepository;
         $this->helper = $helper;
+        $this->_storeManager = $storeManager;
         $this->_logger = $logger;
         parent::__construct($context);
     }
@@ -73,6 +83,7 @@ class SendToOutshifter extends Action
       $productIds = $collection->getAllIds();
       $this->_logger->info('[SendToOutshifter] init by '.implode(",", $productIds));
       $apiKey = $this->helper->getApiKey();
+      $currency = $this->_storeManager->getStore()->getCurrentCurrency()->getCode();
       if ($apiKey) {
           foreach ($productIds as $productId)
           {
@@ -82,7 +93,11 @@ class SendToOutshifter extends Action
                 'title' => $product->getName(),
                 'origin' => 'MAGENTO',
                 'originId' => $productId,
-                'sku' => $product->getSku()
+                'sku' => $product->getSku(),
+                "publicPrice" => array(
+                  "amount" => $product->getPrice(),
+                  "currency" => $currency
+                ),
               );
 
               $ch = curl_init('https://03d1-186-22-17-73.ngrok.io/magento/products');
