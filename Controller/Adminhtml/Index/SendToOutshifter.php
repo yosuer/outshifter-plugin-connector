@@ -106,7 +106,7 @@ class SendToOutshifter extends Action
               $images = array();
               foreach($productImages as $key => $image) {
                 $b64image = base64_encode(file_get_contents($image->getUrl()));
-                $images[] = array('order' => $key, "image" => $b64image);
+                $images[] = array('order' => $key, "image" => 'data:image/jpg;base64,'.$b64image);
               }
               $postData = array(
                 'title' => $product->getName(),
