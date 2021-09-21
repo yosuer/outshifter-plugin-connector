@@ -102,6 +102,12 @@ class SendToOutshifter extends Action
           {
               $product = $this->productLoader->create()->load($productId);
               $quantity = $this->stockState->getStockQty($productId, $product->getStore()->getWebsiteId());
+              $productImages = $product->getMediaGalleryImages();
+              $images = array();
+              foreach($productImages as $key => $image) {
+                $b64image = base64_encode(file_get_contents($image->getUrl()));
+                $images[] = array('order' => $key, "image" => $b64image);
+              }
               $postData = array(
                 'title' => $product->getName(),
                 'origin' => 'MAGENTO',
@@ -114,7 +120,8 @@ class SendToOutshifter extends Action
                 ),
                 "barcode" => "",
                 "weight" => $product->getWeight(),
-                "description" => $product->getDescription()
+                "description" => $product->getDescription(),
+                "images" => $images
               );
 
               $ch = curl_init('https://03d1-186-22-17-73.ngrok.io/magento/products');
