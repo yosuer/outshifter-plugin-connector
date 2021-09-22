@@ -149,8 +149,6 @@ class SendToOutshifter extends Action
                       $strOptions = '';
                       $this->_logger->info('[SendToOutshifter] ======= options ======');
                       foreach ($attribute['values'] as $option) {
-                        $this->_logger->info('[SendToOutshifter] = option label '.$option['label']);
-                        $this->_logger->info('[SendToOutshifter] = option value_index '.$option['value_index']);
                         $strOptions = $strOptions . (($strOptions == '') ? $option['label'] : ',' . $option['label']);
                       }
                       $options[] = array(
@@ -160,24 +158,16 @@ class SendToOutshifter extends Action
                       );
                       $orderOption++;
                     }
-                    $this->_logger->info('[SendToOutshifter] ======= variantions ======');
                     foreach ($available_variations as $variation) {
                       $quantityVariant = $this->stockState->getStockQty($variation->getId(), $variation->getStore()->getWebsiteId());
-                      $this->_logger->info('[SendToOutshifter] ====== variation SKU: '.$variation->getSku());
-                      $this->_logger->info('[SendToOutshifter] price: '.$variation->getPrice());
-                      $this->_logger->info('[SendToOutshifter] quantity: '.$quantityVariant);
                       $quantity = $quantity + $quantityVariant;
                       $title = '';
                       foreach ($attributes as $attribute) {
-                        $this->_logger->info('[SendToOutshifter] === attrCode: '.$attribute['attribute_code']);
                         $optionId = $variation->getData($attribute['attribute_code']);
-                        $this->_logger->info('[SendToOutshifter] optionId: '.$optionId);
                         if (null !== $optionId) {
                           $key = array_search($optionId, array_column($attribute['values'], 'value_index'));
-                          $this->_logger->info('[SendToOutshifter] key: '.$key);
                           if ($key !== false) {
                             $value = $attribute['values'][$key]['label'];
-                            $this->_logger->info('[SendToOutshifter] value: '.$value);
                             $title = $title === '' ? $value : $title.'-'.$value;
                           }
                         }
@@ -187,6 +177,7 @@ class SendToOutshifter extends Action
                         "price" => $variation->getPrice(),
                         "quantity" => $quantityVariant,
                         "title" => $title,
+                        "originId" => $variation->getId(),
                         "barcode" => ""
                       );
                     }
