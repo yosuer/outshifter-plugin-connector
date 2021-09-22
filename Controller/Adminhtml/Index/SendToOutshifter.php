@@ -9,6 +9,7 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Ui\Component\MassAction\Filter;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\CatalogInventory\Api\StockStateInterface;
@@ -36,6 +37,11 @@ class SendToOutshifter extends Action
      * @var ProductRepositoryInterface
      */
     protected $productRepository;
+
+    /**
+     * @var ProductAttributeRepositoryInterface
+     */
+    protected $attributeRepository;
 
     /**
      * @var ProductFactory
@@ -68,6 +74,7 @@ class SendToOutshifter extends Action
      * @param Filter $filter
      * @param CollectionFactory $collectionFactory
      * @param ProductRepositoryInterface $productRepository
+     * @param ProductAttributeRepositoryInterface $attributeRepository
      * @param StoreManagerInterface $storeManager
      * @param StockStateInterface $stockState
      * @param ProductFactory $productLoader
@@ -79,6 +86,7 @@ class SendToOutshifter extends Action
         Filter $filter,
         CollectionFactory $collectionFactory,
         ProductRepositoryInterface $productRepository,
+        ProductAttributeRepositoryInterface $attributeRepository,
         StoreManagerInterface $storeManager,
         StockStateInterface $stockState,
         ProductFactory $productLoader,
@@ -89,6 +97,7 @@ class SendToOutshifter extends Action
         $this->filter = $filter;
         $this->collectionFactory = $collectionFactory;
         $this->productRepository = $productRepository;
+        $this->attributeRepository = $attributeRepository;
         $this->storeManager = $storeManager;
         $this->stockState = $stockState;
         $this->productLoader = $productLoader;
@@ -158,7 +167,8 @@ class SendToOutshifter extends Action
                       $title = '';
                       $this->_logger->info('[SendToOutshifter] ======= variantions ======');
                       foreach ($attributes as $attribute) {
-                        $attrCode = $attribute->getAttributeCode();
+                        $attrId = $attribute->getAttributeId();
+                        $attrCode = $this->attributeRepository->get($attrId)->getAttributeCode();
                         $this->_logger->info('[SendToOutshifter] === attrCode: '.$attrCode);
                         $value = $variation->getData($attrCode);
                         $this->_logger->info('[SendToOutshifter] value: '.$value);
