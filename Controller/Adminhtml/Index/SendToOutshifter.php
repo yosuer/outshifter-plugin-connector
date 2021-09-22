@@ -4,14 +4,15 @@ namespace Outshifter\Outshifter\Controller\Adminhtml\Index;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Ui\Component\MassAction\Filter;
-use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
-use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\CatalogInventory\Api\StockStateInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Catalog\Model\ProductFactory;
+use Magento\CatalogInventory\Api\StockStateInterface;
+use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
 use Outshifter\Outshifter\Helper\Data;
 use Outshifter\Outshifter\Logger\Logger;
 
@@ -44,6 +45,11 @@ class SendToOutshifter extends Action
     protected $storeManager;
 
     /**
+     * @var Configurable
+     */
+    protected $catalogProductTypeConfigurable;
+
+    /**
      * @var Data
      */
     protected $helper;
@@ -73,6 +79,7 @@ class SendToOutshifter extends Action
         StoreManagerInterface $storeManager,
         StockStateInterface $stockState,
         ProductFactory $productLoader,
+        Configurable $catalogProductTypeConfigurable,
         Data $helper,
         Logger $logger)
     {
@@ -82,6 +89,7 @@ class SendToOutshifter extends Action
         $this->storeManager = $storeManager;
         $this->stockState = $stockState;
         $this->productLoader = $productLoader;
+        $this->catalogProductTypeConfigurable = $catalogProductTypeConfigurable;
         $this->helper = $helper;
         $this->_logger = $logger;
         parent::__construct($context);
@@ -99,7 +107,11 @@ class SendToOutshifter extends Action
       $currency = $this->storeManager->getStore()->getCurrentCurrency()->getCode();
       if ($apiKey) {
         foreach ($productIds as $productId)
-          {
+        {
+            $parentByChild = $this->_catalogProductTypeConfigurable->getParentIdsByChild($productId);
+            if (isset($parentByChild[0])) {
+              $this->_logger->info('[SendToOutshifter] skipping product '.$productId.', is a variant.');
+            } else {
               $product = $this->productLoader->create()->load($productId);
               $quantity = $this->stockState->getStockQty($productId, $product->getStore()->getWebsiteId());
               $productImages = $product->getMediaGalleryImages();
@@ -110,20 +122,21 @@ class SendToOutshifter extends Action
               }
               $postData = array(
                 'title' => $product->getName(),
-                'origin' => 'MAGENTO',
-                'originId' => $productId,
-                'sku' => $product->getSku(),
-                "quantity" => $quantity,
+                "description" => $product->getDescription(),
                 "publicPrice" => array(
                   "amount" => $product->getPrice(),
                   "currency" => $currency
                 ),
+                'origin' => 'MAGENTO',
+                'originId' => $productId,
+                "images" => $images,
+                "quantity" => $quantity,
                 "barcode" => "",
+                'sku' => $product->getSku(),
                 "weight" => $product->getWeight(),
-                "description" => $product->getDescription(),
-                "images" => $images
+                "currency" => $currency
               );
-
+  
               $ch = curl_init('https://03d1-186-22-17-73.ngrok.io/magento/products');
               curl_setopt_array($ch, array(
                 CURLOPT_POST => TRUE,
@@ -143,13 +156,14 @@ class SendToOutshifter extends Action
                 $this->messageManager->addError(__('Please review your outshifter api key in Stores -> Configuration -> Outshifter'));
                 break;
               }
-
+  
               curl_close($ch);
-
+  
               $product->setData('outshifter_exported', true);
               $this->productRepository->save($product);
               $this->messageManager->addSuccess(__('The product %1 was exported to outshifter', $productId));
-          }
+            }
+        }
       } else {
           $this->messageManager->addError(__('You should config your outshifter api key in Stores -> Configuration -> Outshifter'));
       }
