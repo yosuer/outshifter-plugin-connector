@@ -113,6 +113,7 @@ class SendToOutshifter extends Action
               $this->_logger->info('[SendToOutshifter] skipping product '.$productId.', is a variant.');
             } else {
               $product = $this->productLoader->create()->load($productId);
+              $this->_logger->info('[SendToOutshifter] exporting product '.$productId.'(type = '.$product->getTypeId().')');
               $quantity = $this->stockState->getStockQty($productId, $product->getStore()->getWebsiteId());
               $productImages = $product->getMediaGalleryImages();
               $images = array();
