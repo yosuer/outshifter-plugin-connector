@@ -132,7 +132,7 @@ class SendToOutshifter extends Action
                 $variants = array();
                 $options = array();
                 if ($optionsEnabled) {
-                  $attributes = $this->catalogProductTypeConfigurable->getConfigurableAttributesAsArray($product);
+                  $attributes = $product->getTypeInstance()->getConfigurableAttributesAsArray($product);
                   $quantity = 0;
                   foreach ($attributes as $key => $attribute) {
                     $strOptions = '';
