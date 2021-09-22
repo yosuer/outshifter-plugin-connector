@@ -117,7 +117,7 @@ class SendToOutshifter extends Action
             } else {
               $product = $this->productLoader->create()->load($productId);
               $productType = $product->getTypeId();
-              if ($productType != SendToOutshifter::SIMPLE || $productType != SendToOutshifter::CONFIGURABLE) {
+              if ($productType !== SendToOutshifter::SIMPLE && $productType !== SendToOutshifter::CONFIGURABLE) {
                 $this->_logger->info('[SendToOutshifter] skipping product '.$productId.', is type '.$productType.'.');
               } else {
                 $this->_logger->info('[SendToOutshifter] exporting product '.$productId.' (type = '.$productType.')');
