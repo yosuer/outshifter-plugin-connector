@@ -108,7 +108,7 @@ class SendToOutshifter extends Action
       if ($apiKey) {
         foreach ($productIds as $productId)
         {
-            $parentByChild = $this->_catalogProductTypeConfigurable->getParentIdsByChild($productId);
+            $parentByChild = $this->catalogProductTypeConfigurable->getParentIdsByChild($productId);
             if (isset($parentByChild[0])) {
               $this->_logger->info('[SendToOutshifter] skipping product '.$productId.', is a variant.');
             } else {
