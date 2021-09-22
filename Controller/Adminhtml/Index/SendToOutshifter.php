@@ -167,7 +167,8 @@ class SendToOutshifter extends Action
                       $title = '';
                       $this->_logger->info('[SendToOutshifter] ======= variantions ======');
                       foreach ($attributes as $attribute) {
-                        $attrCode = $this->attributeRepository->get($attribute['id'])->getAttributeCode();
+                        $attrId = (int)$attribute['id'];
+                        $attrCode = $this->attributeRepository->get($attrId)->getAttributeCode();
                         $this->_logger->info('[SendToOutshifter] === attrCode: '.$attrCode);
                         $value = $variation->getData($attrCode);
                         $this->_logger->info('[SendToOutshifter] value: '.$value);
