@@ -128,6 +128,7 @@ class SendToOutshifter extends Action
                   $b64image = base64_encode(file_get_contents($image->getUrl()));
                   $images[] = array('order' => $key, "image" => 'data:image/jpg;base64,'.$b64image);
                 }
+                $optionsEnabled = $productType === SendToOutshifter::CONFIGURABLE;
                 $postData = array(
                   'title' => $product->getName(),
                   "description" => $product->getDescription(),
@@ -141,6 +142,7 @@ class SendToOutshifter extends Action
                   "quantity" => $quantity,
                   "barcode" => "",
                   'sku' => $product->getSku(),
+                  "optionsEnabled" => $optionsEnabled,
                   "weight" => $product->getWeight(),
                   "currency" => $currency
                 );
