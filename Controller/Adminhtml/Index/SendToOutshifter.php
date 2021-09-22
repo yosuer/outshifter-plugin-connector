@@ -9,7 +9,7 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Ui\Component\MassAction\Filter;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
-use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
+use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\CatalogInventory\Api\StockStateInterface;
@@ -74,7 +74,7 @@ class SendToOutshifter extends Action
      * @param Filter $filter
      * @param CollectionFactory $collectionFactory
      * @param ProductRepositoryInterface $productRepository
-     * @param Attribute $attributeRepository
+     * @param ProductAttributeRepositoryInterface $attributeRepository
      * @param StoreManagerInterface $storeManager
      * @param StockStateInterface $stockState
      * @param ProductFactory $productLoader
@@ -86,7 +86,7 @@ class SendToOutshifter extends Action
         Filter $filter,
         CollectionFactory $collectionFactory,
         ProductRepositoryInterface $productRepository,
-        Attribute $attributeRepository,
+        ProductAttributeRepositoryInterface $attributeRepository,
         StoreManagerInterface $storeManager,
         StockStateInterface $stockState,
         ProductFactory $productLoader,
@@ -167,11 +167,8 @@ class SendToOutshifter extends Action
                       $title = '';
                       $this->_logger->info('[SendToOutshifter] ======= variantions ======');
                       foreach ($attributes as $attribute) {
-                        $this->_logger->info('[SendToOutshifter] === attrId: '.$attribute['id']);
-                        $attr = $this->attributeRepository->load($attribute['id']);
-                        $attrCode = $attr->getAttributeCode();
-                        $this->_logger->info('[SendToOutshifter] attrCode: '.$attrCode);
-                        $value = $variation->getData($attrCode);
+                        $this->_logger->info('[SendToOutshifter] === attrCode: '.$attribute['attribute_code']);
+                        $value = $variation->getData($attribute['attribute_code']);
                         $this->_logger->info('[SendToOutshifter] value: '.$value);
                         if (null !== $value) {
                           $title = $title.'-'.$value;
