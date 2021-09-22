@@ -157,21 +157,20 @@ class SendToOutshifter extends Action
                       );
                       $orderOption++;
                     }
+                    $this->_logger->info('[SendToOutshifter] ======= variantions ======');
                     foreach ($available_variations as $variation) {
                       $quantityVariant = $this->stockState->getStockQty($variation->getId(), $variation->getStore()->getWebsiteId());
-                      $this->_logger->info('[SendToOutshifter] ===> variant: '.$variation->getSku());
+                      $this->_logger->info('[SendToOutshifter] ===> variant: '.json_encode($variation));
                       $this->_logger->info('[SendToOutshifter] price: '.$variation->getPrice());
                       $this->_logger->info('[SendToOutshifter] quantity: '.$quantityVariant);
-
                       $quantity = $quantity + $quantityVariant;
                       $title = '';
-                      $this->_logger->info('[SendToOutshifter] ======= variantions ======');
                       foreach ($attributes as $attribute) {
                         $this->_logger->info('[SendToOutshifter] === attrCode: '.$attribute['attribute_code']);
                         $value = $variation->getData($attribute['attribute_code']);
                         $this->_logger->info('[SendToOutshifter] value: '.$value);
                         if (null !== $value) {
-                          $title = $title.'-'.$value;
+                          $title = $title === '' ? $value : $title.'-'.$value;
                         }
                       }
                       $variants[] = array(
