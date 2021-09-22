@@ -156,7 +156,7 @@ class SendToOutshifter extends Action
                         $attrCode = $attribute->getAttributeCode();
                         $value = $variation->getDataUsingMethod($attrCode) ?: $variation->getData($attrCode);
                         if (null !== $value && $attrCode != 'entity_id') {
-                          $title += '-'.$value;
+                          $title = $title.'-'.$value;
                         }
                       }
                       $variants[] = array(
