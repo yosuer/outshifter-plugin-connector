@@ -147,7 +147,10 @@ class SendToOutshifter extends Action
                     $orderOption = 1;
                     foreach ($attributes as $attribute) {
                       $strOptions = '';
+                      $this->_logger->info('[SendToOutshifter] ======= options ======');
                       foreach ($attribute['values'] as $option) {
+                        $this->_logger->info('[SendToOutshifter] = option'.$option['label']);
+                        $this->_logger->info('[SendToOutshifter] = option'.$option['label']);
                         $strOptions = $strOptions . (($strOptions == '') ? $option['label'] : ',' . $option['label']);
                       }
                       $options[] = array(
@@ -170,7 +173,7 @@ class SendToOutshifter extends Action
                         $optionId = $variation->getData($attribute['attribute_code']);
                         $this->_logger->info('[SendToOutshifter] optionId: '.$optionId);
                         if (null !== $optionId) {
-                          $key = array_search($optionId, array_column($attribute['values'], 'id'));
+                          $key = array_search($optionId, array_column($attribute['values'], 'value_index'));
                           $this->_logger->info('[SendToOutshifter] key: '.$key);
                           if ($key !== false) {
                             $value = $attribute['values'][$key]['id'];
