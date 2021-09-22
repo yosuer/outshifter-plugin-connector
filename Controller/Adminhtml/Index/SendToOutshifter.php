@@ -129,6 +129,24 @@ class SendToOutshifter extends Action
                   $images[] = array('order' => $key, "image" => 'data:image/jpg;base64,'.$b64image);
                 }
                 $optionsEnabled = $productType === SendToOutshifter::CONFIGURABLE;
+                $variants = array();
+                $options = array();
+                if ($optionsEnabled) {
+                  $attributes = $this->catalogProductTypeConfigurable->getConfigurableAttributesAsArray($product);
+                  $quantity = 0;
+                  foreach ($attributes as $key => $attribute) {
+                    $strOptions = '';
+                    foreach ($attribute['values'] as $option) {
+                      $strOptions = $strOptions . (($strOptions == '') ? $option['label'] : ',' . $option['label']);
+                    }
+                    $options[] = array(
+                      "name" => $attribute['label'],
+                      "order" => $key + 1,
+                      "values" => $strOptions
+                    );
+                  }
+                }
+
                 $postData = array(
                   'title' => $product->getName(),
                   "description" => $product->getDescription(),
@@ -143,6 +161,8 @@ class SendToOutshifter extends Action
                   "barcode" => "",
                   'sku' => $product->getSku(),
                   "optionsEnabled" => $optionsEnabled,
+                  "options" => $options,
+                  "variants" => $variants,
                   "weight" => $product->getWeight(),
                   "currency" => $currency
                 );
