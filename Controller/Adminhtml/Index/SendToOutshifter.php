@@ -19,6 +19,9 @@ use Outshifter\Outshifter\Logger\Logger;
 class SendToOutshifter extends Action
 {
 
+    const SIMPLE = 'simple';
+    const CONFIGURABLE = 'configurable';
+
     /**
      * @var Filter
      */
@@ -113,56 +116,61 @@ class SendToOutshifter extends Action
               $this->_logger->info('[SendToOutshifter] skipping product '.$productId.', is a variant.');
             } else {
               $product = $this->productLoader->create()->load($productId);
-              $this->_logger->info('[SendToOutshifter] exporting product '.$productId.'(type = '.$product->getTypeId().')');
-              $quantity = $this->stockState->getStockQty($productId, $product->getStore()->getWebsiteId());
-              $productImages = $product->getMediaGalleryImages();
-              $images = array();
-              foreach($productImages as $key => $image) {
-                $b64image = base64_encode(file_get_contents($image->getUrl()));
-                $images[] = array('order' => $key, "image" => 'data:image/jpg;base64,'.$b64image);
-              }
-              $postData = array(
-                'title' => $product->getName(),
-                "description" => $product->getDescription(),
-                "publicPrice" => array(
-                  "amount" => $product->getPrice(),
+              $productType = $product->getTypeId();
+              if ($productType !== SendToOutshifter::SIMPLE || $productType !== SendToOutshifter::CONFIGURABLE) {
+                $this->_logger->info('[SendToOutshifter] skipping product '.$productId.', is type '.$productType.'.');
+              } else {
+                $this->_logger->info('[SendToOutshifter] exporting product '.$productId.' (type = '.$productType.')');
+                $quantity = $this->stockState->getStockQty($productId, $product->getStore()->getWebsiteId());
+                $productImages = $product->getMediaGalleryImages();
+                $images = array();
+                foreach($productImages as $key => $image) {
+                  $b64image = base64_encode(file_get_contents($image->getUrl()));
+                  $images[] = array('order' => $key, "image" => 'data:image/jpg;base64,'.$b64image);
+                }
+                $postData = array(
+                  'title' => $product->getName(),
+                  "description" => $product->getDescription(),
+                  "publicPrice" => array(
+                    "amount" => $product->getPrice(),
+                    "currency" => $currency
+                  ),
+                  'origin' => 'MAGENTO',
+                  'originId' => $productId,
+                  "images" => $images,
+                  "quantity" => $quantity,
+                  "barcode" => "",
+                  'sku' => $product->getSku(),
+                  "weight" => $product->getWeight(),
                   "currency" => $currency
-                ),
-                'origin' => 'MAGENTO',
-                'originId' => $productId,
-                "images" => $images,
-                "quantity" => $quantity,
-                "barcode" => "",
-                'sku' => $product->getSku(),
-                "weight" => $product->getWeight(),
-                "currency" => $currency
-              );
-  
-              $ch = curl_init('https://03d1-186-22-17-73.ngrok.io/magento/products');
-              curl_setopt_array($ch, array(
-                CURLOPT_POST => TRUE,
-                CURLOPT_RETURNTRANSFER => TRUE,
-                CURLOPT_HTTPHEADER => array(
-                    'authorization: '.$apiKey,
-                    'Content-Type: application/json'
-                ),
-                CURLOPT_POSTFIELDS => json_encode($postData)
-              ));
-              $response = curl_exec($ch);
-              if($response === FALSE) {
-                $this->messageManager->addError(__('Connection problem exporting product %1, try again in a moment', $productId));
-                die(curl_error($ch));
+                );
+    
+                $ch = curl_init('https://03d1-186-22-17-73.ngrok.io/magento/products');
+                curl_setopt_array($ch, array(
+                  CURLOPT_POST => TRUE,
+                  CURLOPT_RETURNTRANSFER => TRUE,
+                  CURLOPT_HTTPHEADER => array(
+                      'authorization: '.$apiKey,
+                      'Content-Type: application/json'
+                  ),
+                  CURLOPT_POSTFIELDS => json_encode($postData)
+                ));
+                $response = curl_exec($ch);
+                if($response === FALSE) {
+                  $this->messageManager->addError(__('Connection problem exporting product %1, try again in a moment', $productId));
+                  die(curl_error($ch));
+                }
+                if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 401) {
+                  $this->messageManager->addError(__('Please review your outshifter api key in Stores -> Configuration -> Outshifter'));
+                  break;
+                }
+    
+                curl_close($ch);
+    
+                $product->setData('outshifter_exported', true);
+                $this->productRepository->save($product);
+                $this->messageManager->addSuccess(__('The product %1 was exported to outshifter', $productId));
               }
-              if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 401) {
-                $this->messageManager->addError(__('Please review your outshifter api key in Stores -> Configuration -> Outshifter'));
-                break;
-              }
-  
-              curl_close($ch);
-  
-              $product->setData('outshifter_exported', true);
-              $this->productRepository->save($product);
-              $this->messageManager->addSuccess(__('The product %1 was exported to outshifter', $productId));
             }
         }
       } else {
