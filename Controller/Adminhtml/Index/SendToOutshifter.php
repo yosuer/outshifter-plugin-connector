@@ -160,7 +160,8 @@ class SendToOutshifter extends Action
                     $this->_logger->info('[SendToOutshifter] ======= variantions ======');
                     foreach ($available_variations as $variation) {
                       $quantityVariant = $this->stockState->getStockQty($variation->getId(), $variation->getStore()->getWebsiteId());
-                      $this->_logger->info('[SendToOutshifter] ===> variant: '.((string)$variation));
+                      $this->_logger->info('[SendToOutshifter] ===> variant: '.var_dump(json_encode($variation)));
+                      $this->_logger->info('[SendToOutshifter] ====> variant: '.implode('; ', $variation));
                       $this->_logger->info('[SendToOutshifter] price: '.$variation->getPrice());
                       $this->_logger->info('[SendToOutshifter] quantity: '.$quantityVariant);
                       $quantity = $quantity + $quantityVariant;
