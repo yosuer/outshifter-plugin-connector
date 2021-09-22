@@ -160,18 +160,23 @@ class SendToOutshifter extends Action
                     $this->_logger->info('[SendToOutshifter] ======= variantions ======');
                     foreach ($available_variations as $variation) {
                       $quantityVariant = $this->stockState->getStockQty($variation->getId(), $variation->getStore()->getWebsiteId());
-                      $this->_logger->info('[SendToOutshifter] ===> variant: '.var_dump(json_encode($variation)));
-                      $this->_logger->info('[SendToOutshifter] ====> variant: '.implode('; ', $variation));
+                      $this->_logger->info('[SendToOutshifter] ====== variation SKU: '.$variation->getSku());
                       $this->_logger->info('[SendToOutshifter] price: '.$variation->getPrice());
                       $this->_logger->info('[SendToOutshifter] quantity: '.$quantityVariant);
                       $quantity = $quantity + $quantityVariant;
                       $title = '';
                       foreach ($attributes as $attribute) {
                         $this->_logger->info('[SendToOutshifter] === attrCode: '.$attribute['attribute_code']);
-                        $value = $variation->getData($attribute['attribute_code']);
-                        $this->_logger->info('[SendToOutshifter] value: '.$value);
-                        if (null !== $value) {
-                          $title = $title === '' ? $value : $title.'-'.$value;
+                        $optionId = $variation->getData($attribute['attribute_code']);
+                        $this->_logger->info('[SendToOutshifter] optionId: '.$optionId);
+                        if (null !== $optionId) {
+                          $key = array_search($optionId, array_column($attribute['values'], 'id'));
+                          $this->_logger->info('[SendToOutshifter] key: '.$key);
+                          if ($key !== false) {
+                            $value = $attribute['values'][$key]['id'];
+                            $this->_logger->info('[SendToOutshifter] value: '.$value);
+                            $title = $title === '' ? $value : $title.'-'.$value;
+                          }
                         }
                       }
                       $variants[] = array(
