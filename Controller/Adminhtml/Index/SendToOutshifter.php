@@ -117,7 +117,7 @@ class SendToOutshifter extends Action
             } else {
               $product = $this->productLoader->create()->load($productId);
               $productType = $product->getTypeId();
-              if ($productType !== SendToOutshifter::SIMPLE && $productType !== SendToOutshifter::CONFIGURABLE) {
+              if ($productType !== SendToOutshifter::SIMPLE && !$product->isConfigurable()) {
                 $this->_logger->info('[SendToOutshifter] skipping product '.$productId.', is type '.$productType.'.');
               } else {
                 $this->_logger->info('[SendToOutshifter] exporting product '.$productId.' (type = '.$productType.')');
@@ -131,20 +131,42 @@ class SendToOutshifter extends Action
                 $optionsEnabled = $productType === SendToOutshifter::CONFIGURABLE;
                 $variants = array();
                 $options = array();
-                if ($optionsEnabled) {
-                  $attributes = $product->getTypeInstance()->getConfigurableAttributesAsArray($product);
-                  $quantity = 0;
-                  foreach ($attributes as $key => $attribute) {
-                    $strOptions = '';
-                    foreach ($attribute['values'] as $option) {
-                      $strOptions = $strOptions . (($strOptions == '') ? $option['label'] : ',' . $option['label']);
+                if ($product->isConfigurable()) {
+                    $available_variations = $product->getTypeInstance()->getUsedProducts($product);
+                    $attributes = $product->getTypeInstance()->getConfigurableAttributesAsArray($product);
+                    $quantity = 0;
+                    $orderOption = 1;
+                    foreach ($attributes as $attribute) {
+                      $strOptions = '';
+                      foreach ($attribute['values'] as $option) {
+                        $strOptions = $strOptions . (($strOptions == '') ? $option['label'] : ',' . $option['label']);
+                      }
+                      $options[] = array(
+                        "name" => $attribute['label'],
+                        "order" => $orderOption,
+                        "values" => $strOptions
+                      );
+                      $orderOption++;
                     }
-                    $options[] = array(
-                      "name" => $attribute['label'],
-                      "order" => $key + 1,
-                      "values" => $strOptions
-                    );
-                  }
+                    foreach ($available_variations as $variation) {
+                      $quantityVariant = $this->stockState->getStockQty($variation->getId(), $variation->getStore()->getWebsiteId());
+                      $quantity = $quantity + $quantityVariant;
+                      $title = '';
+                      foreach ($variation->getAttributes() as $attribute) {
+                        $attrCode = $attribute->getAttributeCode();
+                        $value = $variation->getDataUsingMethod($attrCode) ?: $variation->getData($attrCode);
+                        if (null !== $value && $attrCode != 'entity_id') {
+                          $title += '-'.$value;
+                        }
+                      }
+                      $variants[] = array(
+                        "sku" => $variation->getSku(),
+                        "price" => $variation->getPrice(),
+                        "quantity" => $quantityVariant,
+                        "title" => $title,
+                        "barcode" => ""
+                      );
+                    }
                 }
 
                 $postData = array(
