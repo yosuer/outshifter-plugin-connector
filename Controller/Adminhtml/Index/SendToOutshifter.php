@@ -173,7 +173,7 @@ class SendToOutshifter extends Action
                         $optionId = $variation->getData($attribute['attribute_code']);
                         $this->_logger->info('[SendToOutshifter] optionId: '.$optionId);
                         if (null !== $optionId) {
-                          $key = array_search($optionId, array_column($attribute['values'], 'value_index'));
+                          $key = array_search($optionId, array_column($attribute['values'], 'value'));
                           $this->_logger->info('[SendToOutshifter] key: '.$key);
                           if ($key !== false) {
                             $value = $attribute['values'][$key]['id'];
