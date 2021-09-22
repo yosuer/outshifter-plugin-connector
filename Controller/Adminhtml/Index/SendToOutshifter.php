@@ -149,8 +149,8 @@ class SendToOutshifter extends Action
                       $strOptions = '';
                       $this->_logger->info('[SendToOutshifter] ======= options ======');
                       foreach ($attribute['values'] as $option) {
-                        $this->_logger->info('[SendToOutshifter] = option'.$option['label']);
-                        $this->_logger->info('[SendToOutshifter] = option'.$option['label']);
+                        $this->_logger->info('[SendToOutshifter] = option '.$option['label']);
+                        $this->_logger->info('[SendToOutshifter] = option '.$option['label']);
                         $strOptions = $strOptions . (($strOptions == '') ? $option['label'] : ',' . $option['label']);
                       }
                       $options[] = array(
@@ -176,7 +176,7 @@ class SendToOutshifter extends Action
                           $key = array_search($optionId, array_column($attribute['values'], 'value'));
                           $this->_logger->info('[SendToOutshifter] key: '.$key);
                           if ($key !== false) {
-                            $value = $attribute['values'][$key]['id'];
+                            $value = $attribute['values'][$key]['label'];
                             $this->_logger->info('[SendToOutshifter] value: '.$value);
                             $title = $title === '' ? $value : $title.'-'.$value;
                           }
