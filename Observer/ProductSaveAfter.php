@@ -4,7 +4,7 @@ namespace Outshifter\Outshifter\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 
-class ProductSaveBefore implements ObserverInterface
+class ProductSaveAfter implements ObserverInterface
 {
 
     /**
