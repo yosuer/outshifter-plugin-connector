@@ -7,14 +7,12 @@ use Magento\Backend\App\Action\Context;
 use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Ui\Component\MassAction\Filter;
-use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Catalog\Model\ProductFactory;
-use Magento\CatalogInventory\Api\StockStateInterface;
-use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
 use Outshifter\Outshifter\Helper\Data;
+use Outshifter\Outshifter\Helper\Utils;
 use Outshifter\Outshifter\Logger\Logger;
 
 class SendToOutshifter extends Action
@@ -49,19 +47,14 @@ class SendToOutshifter extends Action
     protected $productLoader;
 
     /**
-     * @var ProductRepositoryInterface
-     */
-    protected $storeManager;
-
-    /**
-     * @var Configurable
-     */
-    protected $catalogProductTypeConfigurable;
-
-    /**
      * @var Data
      */
     protected $helper;
+
+    /**
+     * @var Utils
+     */
+    protected $utils;
 
     /**
      * @var Logger
@@ -75,8 +68,6 @@ class SendToOutshifter extends Action
      * @param CollectionFactory $collectionFactory
      * @param ProductRepositoryInterface $productRepository
      * @param ProductAttributeRepositoryInterface $attributeRepository
-     * @param StoreManagerInterface $storeManager
-     * @param StockStateInterface $stockState
      * @param ProductFactory $productLoader
      * @param Data $helper
      * @param Logger $logger
@@ -87,22 +78,18 @@ class SendToOutshifter extends Action
         CollectionFactory $collectionFactory,
         ProductRepositoryInterface $productRepository,
         ProductAttributeRepositoryInterface $attributeRepository,
-        StoreManagerInterface $storeManager,
-        StockStateInterface $stockState,
         ProductFactory $productLoader,
-        Configurable $catalogProductTypeConfigurable,
         Data $helper,
+        Utils $utils,
         Logger $logger)
     {
         $this->filter = $filter;
         $this->collectionFactory = $collectionFactory;
         $this->productRepository = $productRepository;
         $this->attributeRepository = $attributeRepository;
-        $this->storeManager = $storeManager;
-        $this->stockState = $stockState;
         $this->productLoader = $productLoader;
-        $this->catalogProductTypeConfigurable = $catalogProductTypeConfigurable;
         $this->helper = $helper;
+        $this->utils = $utils;
         $this->_logger = $logger;
         parent::__construct($context);
     }
@@ -116,12 +103,12 @@ class SendToOutshifter extends Action
       $productIds = $collection->getAllIds();
       $this->_logger->info('[SendToOutshifter] init by '.implode(",", $productIds));
       $apiKey = $this->helper->getApiKey();
-      $currency = $this->storeManager->getStore()->getCurrentCurrency()->getCode();
+      $currency = $this->utils->getCurrencyStore();
       if ($apiKey) {
         foreach ($productIds as $productId)
         {
-            $parentByChild = $this->catalogProductTypeConfigurable->getParentIdsByChild($productId);
-            if (isset($parentByChild[0])) {
+            $hasParent = $this->utils->hasParent($productId);
+            if ($hasParent) {
               $this->_logger->info('[SendToOutshifter] skipping product '.$productId.', is a variant.');
             } else {
               $product = $this->productLoader->create()->load($productId);
@@ -130,7 +117,7 @@ class SendToOutshifter extends Action
                 $this->_logger->info('[SendToOutshifter] skipping product '.$productId.', is type '.$productType.'.');
               } else {
                 $this->_logger->info('[SendToOutshifter] exporting product '.$productId.' (type = '.$productType.')');
-                $quantity = $this->stockState->getStockQty($productId, $product->getStore()->getWebsiteId());
+                $quantity = $this->utils->getQuantity($product);
                 $productImages = $product->getMediaGalleryImages();
                 $images = array();
                 foreach($productImages as $key => $image) {
@@ -147,7 +134,6 @@ class SendToOutshifter extends Action
                     $orderOption = 1;
                     foreach ($attributes as $attribute) {
                       $strOptions = '';
-                      $this->_logger->info('[SendToOutshifter] ======= options ======');
                       foreach ($attribute['values'] as $option) {
                         $strOptions = $strOptions . (($strOptions == '') ? $option['label'] : ',' . $option['label']);
                       }
@@ -159,7 +145,7 @@ class SendToOutshifter extends Action
                       $orderOption++;
                     }
                     foreach ($available_variations as $variation) {
-                      $quantityVariant = $this->stockState->getStockQty($variation->getId(), $variation->getStore()->getWebsiteId());
+                      $quantityVariant = $this->utils->getQuantity($variation);
                       $quantity = $quantity + $quantityVariant;
                       $title = '';
                       foreach ($attributes as $attribute) {
