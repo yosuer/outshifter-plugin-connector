@@ -11,18 +11,16 @@ class ProductSaveAfter implements ObserverInterface
     /**
      * @var Logger
      */
-    protected $logger;
+    protected $_logger;
 
-    public function __construct(
-      Logger $logger
-    )
+    public function __construct(Logger $logger)
     {
-        $this->logger = $logger;
+        $this->_logger = $logger;
     }
 
     public function execute(Observer $observer)
     {
         $product = $observer->getProduct();
-        $this->logger->info('[ProductSaveAfter] by product '.$id = $product->getId());
+        $this->_logger->info('[ProductSaveAfter] by product '.$id = $product->getId());
     }
 }
