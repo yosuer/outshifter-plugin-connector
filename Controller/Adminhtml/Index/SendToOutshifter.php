@@ -102,18 +102,13 @@ class SendToOutshifter extends Action
               $this->_logger->info('[SendToOutshifter] skipping product '.$productId.', is a variant.');
             } else {
               $product = $this->productLoader->create()->load($productId);
-              $productType = $product->getTypeId();
-              if ($productType !== SendToOutshifter::SIMPLE && $productType !== SendToOutshifter::CONFIGURABLE) {
-                $this->_logger->info('[SendToOutshifter] skipping product '.$productId.', is type '.$productType.'.');
-              } else {
-                $result = $this->outshifterService->saveProduct($product, $apiKey, $currency);
-                if ($result['success']) {
-                  $product->setData('outshifter_exported', true);
-                  $this->productRepository->save($product);
-                  $this->messageManager->addSuccess(__('The product %1 was exported to outshifter', $productId));
-                } else {
-                  $this->messageManager->addError(__($result['message'], $productId));
-                }
+              $result = $this->outshifterService->saveProduct($product, $apiKey, $currency);
+              if ($result['success']) {
+                $product->setData('outshifter_exported', true);
+                $this->productRepository->save($product);
+                $this->messageManager->addSuccess(__('The product %1 was exported to outshifter', $productId));
+              } else if ($result['message']) {
+                $this->messageManager->addError(__($result['message'], $productId));
               }
             }
         }
