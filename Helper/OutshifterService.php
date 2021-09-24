@@ -46,8 +46,25 @@ class OutshifterService extends AbstractHelper
         return $productType === 'simple' || $productType === 'configurable';
     }
 
-    public function deleteProduct() {
+    public function deleteProduct($product) {
       $apiKey = $this->helper->getApiKey();
+      $productId = $product->getId();
+      $ch = curl_init('https://03d1-186-22-17-73.ngrok.io/magento/products/'.$productId);
+      curl_setopt_array($ch, array(
+          CURLOPT_CUSTOMREQUEST => "DELETE",
+          CURLOPT_RETURNTRANSFER => TRUE,
+          CURLOPT_HTTPHEADER => array(
+              'authorization: '.$apiKey,
+              'Content-Type: application/json'
+          ),
+      ));
+      $response = curl_exec($ch);
+      if($response === FALSE) {
+        $this->_logger->info('[OutshifterService.saveProduct] Connection problem deleting product '.$productId.', try again in a moment');
+      }
+      if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 401) {
+        $this->_logger->info('[OutshifterService.saveProduct] Auth problem deleting product '.$productId);
+      }
     }
 
     public function saveProduct($product)

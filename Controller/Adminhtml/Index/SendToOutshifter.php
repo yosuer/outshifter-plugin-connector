@@ -97,7 +97,7 @@ class SendToOutshifter extends Action
             if ($hasParent) {
               $this->_logger->info('[SendToOutshifter] skipping product '.$productId.', is a variant.');
             } else {
-              $product = $this->productLoader->create()->load($productId);
+              $product = $this->productRepository->getById($productId);
               if ($this->outshifterService->isExportable($product)) {
                 $product->setData('outshifter_exported', true);
                 $this->productRepository->save($product);

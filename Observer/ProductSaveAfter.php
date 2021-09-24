@@ -35,6 +35,8 @@ class ProductSaveAfter implements ObserverInterface
         $this->_logger->info('[ProductSaveAfter] by product '.$id.', outshifter_exported='.$outshifterExported);
         if ($outshifterExported == 1) {
           $this->outshifterService->saveProduct($product);
+        } else {
+          $this->outshifterService->deleteProduct($product);
         }
     }
 }

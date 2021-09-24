@@ -65,30 +65,10 @@ class RemoveInOutshifter extends Action
         $apiKey = $this->helper->getApiKey();
         foreach ($productIds as $productId)
         {
-            $productDataObject = $this->productRepository->getById($productId);
-
-            $ch = curl_init('https://03d1-186-22-17-73.ngrok.io/magento/products/'.$productId);
-            curl_setopt_array($ch, array(
-              CURLOPT_CUSTOMREQUEST => "DELETE",
-              CURLOPT_RETURNTRANSFER => TRUE,
-              CURLOPT_HTTPHEADER => array(
-                  'authorization: '.$apiKey,
-                  'Content-Type: application/json'
-              ),
-            ));
-            $response = curl_exec($ch);
-            if($response === FALSE) {
-              $this->messageManager->addError(__('Connection problem exporting product %1, try again in a moment', $productId));
-              die(curl_error($ch));
-            }
-            if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 401) {
-              $this->messageManager->addError(__('Please review your outshifter api key in Stores -> Configuration -> Outshifter'));
-              break;
-            }
-
-            $productDataObject->setData('outshifter_exported', false);
-            $this->productRepository->save($productDataObject);
-            $this->messageManager->addSuccess(__('The product %1 was deleted in outshifter', $productId));
+            $product = $this->productRepository->getById($productId);
+            $product->setData('outshifter_exported', false);
+            $this->productRepository->save($product);
+            $this->messageManager->addSuccess(__('The product %1 will be deleted in outshifter', $productId));
         }
 
         $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
