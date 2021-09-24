@@ -90,7 +90,6 @@ class SendToOutshifter extends Action
       $productIds = $collection->getAllIds();
       $this->_logger->info('[SendToOutshifter] init by '.implode(",", $productIds));
       $apiKey = $this->helper->getApiKey();
-      $currency = $this->utils->getCurrencyStore();
       if ($apiKey) {
         foreach ($productIds as $productId)
         {
