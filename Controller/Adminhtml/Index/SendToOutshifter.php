@@ -18,9 +18,6 @@ use Outshifter\Outshifter\Logger\Logger;
 class SendToOutshifter extends Action
 {
 
-    const SIMPLE = 'simple';
-    const CONFIGURABLE = 'configurable';
-
     /**
      * @var Filter
      */
@@ -102,13 +99,10 @@ class SendToOutshifter extends Action
               $this->_logger->info('[SendToOutshifter] skipping product '.$productId.', is a variant.');
             } else {
               $product = $this->productLoader->create()->load($productId);
-              $result = $this->outshifterService->saveProduct($product, $apiKey, $currency);
-              if ($result['success']) {
+              if ($this->outshifterService->isExportable($product)) {
                 $product->setData('outshifter_exported', true);
                 $this->productRepository->save($product);
-                $this->messageManager->addSuccess(__('The product %1 was exported to outshifter', $productId));
-              } else if ($result['message']) {
-                $this->messageManager->addError(__($result['message'], $productId));
+                $this->messageManager->addSuccess(__('The product %1 will be exported to outshifter', $productId));
               }
             }
         }

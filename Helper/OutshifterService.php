@@ -32,16 +32,18 @@ class OutshifterService extends AbstractHelper
         parent::__construct($context);
     }
 
+    public function isExportable($product)
+    {
+        $productType = $product->getTypeId();
+        return $productType === 'simple' || $productType === 'configurable';
+    }
+
     public function saveProduct($product, $apiKey, $currency)
     {
-        $result = array(
-          'success' => true,
-        );
         $productType = $product->getTypeId();
         $productId = $product->getId();
-        if ($productType !== 'simple' && $productType !== 'configurable') {
+        if ($this->isExportable($product)) {
           $this->_logger->info('[OutshifterService.saveProduct] skipping product '.$productId.' (type='.$productType.').');
-          $result['success'] = false;
         } else {
           $this->_logger->info('[OutshifterService.saveProduct] exporting product '.$productId.' (type='.$productType.')');
           $quantity = $this->utils->getQuantity($product);
@@ -128,17 +130,9 @@ class OutshifterService extends AbstractHelper
           ));
           $response = curl_exec($ch);
           if($response === FALSE) {
-            $result['message'] = 'Connection problem exporting product %1, try again in a moment';
-            $result['success'] = false;
+            $this->_logger->info('[OutshifterService.saveProduct] Connection problem exporting product '.$productId.', try again in a moment');
           }
-          if (curl_getinfo($ch, CURLINFO_HTTP_CODE) == 401) {
-            $result['message'] = 'Please review your outshifter api key in Stores -> Configuration -> Outshifter';
-            $result['success'] = false;
-          }
-  
           curl_close($ch);
         }
-        return $result;
-
     }
 }

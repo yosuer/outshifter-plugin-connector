@@ -21,6 +21,8 @@ class ProductSaveAfter implements ObserverInterface
     public function execute(Observer $observer)
     {
         $product = $observer->getProduct();
-        $this->_logger->info('[ProductSaveAfter] by product '.$id = $product->getId());
+        $id = $product->getId();
+        $outshifterExported = $product->getData('outshifter_exported');
+        $this->_logger->info('[ProductSaveAfter] by product '.$id.', outshifter_exported='.$outshifterExported);
     }
 }
