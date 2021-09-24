@@ -88,7 +88,7 @@ class SendToOutshifter extends Action
     {
       $collection = $this->filter->getCollection($this->collectionFactory->create());
       $productIds = $collection->getAllIds();
-      $this->_logger->info('[SendToOutshifter] init by '.implode(",", $productIds));
+      $this->_logger->info('[SendToOutshifter] products: '.implode(",", $productIds));
       $apiKey = $this->helper->getApiKey();
       if ($apiKey) {
         foreach ($productIds as $productId)
