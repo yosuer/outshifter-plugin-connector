@@ -17,7 +17,7 @@ class ProductSaveAfter implements ObserverInterface
     {
         $this->_logger = $logger;
     }
-
+ 
     public function execute(Observer $observer)
     {
         $product = $observer->getProduct();
