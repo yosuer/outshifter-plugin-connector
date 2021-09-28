@@ -14,6 +14,8 @@
       <resource name="Magento_Sales::cancel" />
       <resource name="Magento_Sales::sales_invoice" />
       <resource name="Magento_Sales::shipment" />
+      <resource name="Magento_Cart::cart" />
+      <resource name="Magento_Cart::manage" />
     </resources>
   </integration>
 </integrations>
