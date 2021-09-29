@@ -37,9 +37,9 @@ class OutshifterApiServiceImpl
     try {
       $response = $this->utils->getCurrencyStore();
     } catch (\Exception $e) {
-      $response = ['error' => $e->getMessage()];
+      $response = $e->getMessage();
     }
 
-    return json_encode($response);
+    return $response;
   }
 }
