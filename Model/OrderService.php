@@ -1,13 +1,15 @@
-<?php 
+<?php
+
 namespace Outshifter\Outshifter\Model;
 
-class OrderService {
+class OrderService
+{
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function save($param)
-	{
-		return 'api POST return the $param ' . $param;
-	}
+  /**
+   * {@inheritdoc}
+   */
+  public function save()
+  {
+    return 'save order';
+  }
 }
