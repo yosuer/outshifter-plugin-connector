@@ -6,6 +6,7 @@
       <module name="Magento_Config" />
       <module name="Magento_Integration" />
       <module name="Magento_Catalog" />
+      <module name="Magento_Webapi" />
     </sequence>
   </module>
 </config>
