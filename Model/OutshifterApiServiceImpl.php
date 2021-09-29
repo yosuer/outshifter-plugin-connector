@@ -2,8 +2,16 @@
 
 namespace Outshifter\Outshifter\Model;
 
-class ConfigService
+class OutshifterApiServiceImpl
 {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function saveOrder()
+  {
+    return 'save order';
+  }
 
   /**
    * {@inheritdoc}
