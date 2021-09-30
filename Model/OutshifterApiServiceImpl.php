@@ -170,6 +170,10 @@ class OutshifterApiServiceImpl
 
     $this->_logger->info('[OutshifterApi.saveOrder] Cart ' . $cart->getId() . ' saved');
 
+    $cartCustomer = $cart->getCustomer();
+
+    $this->_logger->info('[OutshifterApi.saveOrder] CartCustomer: ' . implode('; ', $cartCustomer));
+
     $orderId = $this->cartManagement->placeOrder($cart->getId());
 
     $this->_logger->info('[OutshifterApi.saveOrder] Order ' . $orderId . ' created');
