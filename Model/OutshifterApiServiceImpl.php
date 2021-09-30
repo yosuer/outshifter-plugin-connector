@@ -93,10 +93,9 @@ class OutshifterApiServiceImpl
   /**
    * {@inheritdoc}
    */
-  public function saveOrder()
+  public function saveOrder($orderDto)
   {
     $orderData = [
-      'email'        => 'test@iqplus.com', //buyer email id
       'shipping_address' => [
         'firstname'    => 'jhon', //address Details
         'lastname'     => 'Deo',
@@ -110,19 +109,20 @@ class OutshifterApiServiceImpl
         'save_in_address_book' => 0
       ]
     ];
+    $this->_logger->info('[OutshifterApi.saveOrder] Creating order to custmer ' . $orderDto->getEmail());
     $store = $this->storeManager->getStore();
     $websiteId = $this->storeManager->getStore()->getWebsiteId();
     $customer = $this->customerFactory->create();
     $customer->setWebsiteId($websiteId);
-    $customer->loadByEmail($orderData['email']); // load customet by email address
+    $customer->loadByEmail($orderDto->getEmail());
     if (!$customer->getEntityId()) {
       //If not avilable then create this customer 
       $customer->setWebsiteId($websiteId)
         ->setStore($store)
         ->setFirstname($orderData['shipping_address']['firstname'])
         ->setLastname($orderData['shipping_address']['lastname'])
-        ->setEmail($orderData['email'])
-        ->setPassword($orderData['email']);
+        ->setEmail($orderDto->getEmail())
+        ->setPassword($orderDto->getEmail());
       $customer->save();
     }
 

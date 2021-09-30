@@ -7,9 +7,12 @@ interface OutshifterApiService
 
   /**
    * POST order in magento store
-   * @return string
+   * 
+   * @api
+   * @param Outshifter\Outshifter\Api\Data\OrderDtoInterface $orderDto The orderDto
+   * @return string The orderId
    */
-  public function saveOrder();
+  public function saveOrder($orderDto);
 
   /**
    * GET currency magento store
