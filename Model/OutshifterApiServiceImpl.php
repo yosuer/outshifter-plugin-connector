@@ -81,7 +81,7 @@ class OutshifterApiServiceImpl
   public function saveOrder()
   {
     $orderData = [
-      'email'        => 'test@webkul.com', //buyer email id
+      'email'        => 'test@iqplus.com', //buyer email id
       'shipping_address' => [
         'firstname'    => 'jhon', //address Details
         'lastname'     => 'Deo',
@@ -98,13 +98,21 @@ class OutshifterApiServiceImpl
     $store = $this->storeManager->getStore();
     $websiteId = $this->storeManager->getStore()->getWebsiteId();
     $customer = $this->customerFactory->create();
-    $customer->setWebsiteId($websiteId)
-      ->setStore($store)
-      ->setFirstname('Nombre')
-      ->setLastname('Apellido')
-      ->setEmail('test@aaaa.com')
-      ->setPassword('password');
-    $customer->save();
+    $customer->setWebsiteId($websiteId);
+    $customer->loadByEmail($orderData['email']); // load customet by email address
+    if (!$customer->getEntityId()) {
+      //If not avilable then create this customer 
+      $customer->setWebsiteId($websiteId)
+        ->setStore($store)
+        ->setFirstname($orderData['shipping_address']['firstname'])
+        ->setLastname($orderData['shipping_address']['lastname'])
+        ->setEmail($orderData['email'])
+        ->setPassword($orderData['email']);
+      $customer->save();
+    }
+
+    $this->_logger->info('[OutshifterApi.saveOrder] Customer created');
+
     $quote = $this->quoteFactory->create();
     $quote->setStore($store);
     $customer = $this->customerRepository->getById($customer->getEntityId());
@@ -117,14 +125,20 @@ class OutshifterApiServiceImpl
       intval(1)
     );
 
+    $this->_logger->info('[OutshifterApi.saveOrder] Product added');
+
     $quote->getBillingAddress()->addData($orderData['shipping_address']);
     $quote->getShippingAddress()->addData($orderData['shipping_address']);
-    $shippingAddress = $quote->getShippingAddress();
-    $shippingAddress->setCollectShippingRates(true)
-      ->collectShippingRates()
-      ->setShippingMethod('freeshipping_freeshipping');
+    $quote->getShippingAddress()->setCollectShippingRates(true);
+    $quote->getShippingAddress()->setShippingMethod('freeshipping_freeshipping');
+
+    $this->_logger->info('[OutshifterApi.saveOrder] Shipping method setted');
+
     $quote->setPaymentMethod('checkmo'); //payment method
     $quote->setInventoryProcessed(false); //not effetc inventory
+
+    $this->_logger->info('[OutshifterApi.saveOrder] Payment method setted');
+
     $quote->save(); //Now Save quote and your quote is ready
 
     // Set Sales Order Payment
@@ -136,6 +150,9 @@ class OutshifterApiServiceImpl
     // Create Order From Quote
     $order = $this->quoteManagement->submit($quote);
     $order->setEmailSent(0);
+
+    $this->_logger->info('[OutshifterApi.saveOrder] Order created');
+
     if ($order->getEntityId()) {
       $result = $order->getRealOrderId();
     } else {
