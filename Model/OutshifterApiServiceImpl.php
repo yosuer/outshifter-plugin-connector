@@ -141,11 +141,15 @@ class OutshifterApiServiceImpl
 
     $quote->save(); //Now Save quote and your quote is ready
 
+    $this->_logger->info('[OutshifterApi.saveOrder] Quote saved');
+
     // Set Sales Order Payment
     $quote->getPayment()->importData(['method' => 'checkmo']);
 
     // Collect Totals & Save Quote
     $quote->collectTotals()->save();
+
+    $this->_logger->info('[OutshifterApi.saveOrder] Quote prepared');
 
     // Create Order From Quote
     $order = $this->quoteManagement->submit($quote);
