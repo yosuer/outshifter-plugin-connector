@@ -155,25 +155,26 @@ class OutshifterApiServiceImpl
 
     $this->_logger->info('[OutshifterApi.saveOrder] Payment method setted');
 
-    $this->_logger->info('[OutshifterApi.saveOrder] Quote saved');
-
     // Set Sales Order Payment
     $cart->getPayment()->importData(['method' => 'checkmo']);
 
     // Collect Totals & Save Quote
     $cart->collectTotals();
 
-    $this->_logger->info('[OutshifterApi.saveOrder] Quote prepared');
+    $this->_logger->info('[OutshifterApi.saveOrder] Cart prepared');
 
     // Create Order From Quote
     $cart->save();
 
-    $this->_logger->info('[OutshifterApi.saveOrder] Order created');
-
     $cart = $this->cartRepository->get($cart->getId());
 
-    $order_id = $this->cartManagement->placeOrder($cart->getId());
-    return $order_id;
+    $this->_logger->info('[OutshifterApi.saveOrder] Cart ' . $cart->getId() . ' saved');
+
+    $orderId = $this->cartManagement->placeOrder($cart->getId());
+
+    $this->_logger->info('[OutshifterApi.saveOrder] Order ' . $orderId . ' created');
+
+    return $orderId;
   }
 
   /**
