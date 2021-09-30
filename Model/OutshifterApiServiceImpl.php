@@ -5,10 +5,11 @@ namespace Outshifter\Outshifter\Model;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Customer\Model\CustomerFactory;
 use Magento\Quote\Model\QuoteFactory;
-use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Quote\Model\QuoteManagement;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Api\CartManagementInterface;
 use Outshifter\Outshifter\Helper\Utils;
 use Outshifter\Outshifter\Logger\Logger;
 
@@ -46,6 +47,16 @@ class OutshifterApiServiceImpl
   protected $quoteManagement;
 
   /**
+   * @var CartRepositoryInterface
+   */
+  protected $cartRepository;
+
+  /**
+   * @var CartManagementInterface
+   */
+  protected $cartManagement;
+
+  /**
    * @var Utils
    */
   protected $utils;
@@ -62,6 +73,8 @@ class OutshifterApiServiceImpl
     CustomerRepositoryInterface $customerRepository,
     Product $productModel,
     QuoteManagement $quoteManagement,
+    CartRepositoryInterface $cartRepository,
+    CartManagementInterface $cartManagement,
     Utils $utils,
     Logger $logger
   ) {
@@ -71,6 +84,8 @@ class OutshifterApiServiceImpl
     $this->customerRepository = $customerRepository;
     $this->productModel = $productModel;
     $this->quoteManagement = $quoteManagement;
+    $this->cartRepository = $cartRepository;
+    $this->cartManagement = $cartManagement;
     $this->utils = $utils;
     $this->_logger = $logger;
   }
@@ -113,56 +128,52 @@ class OutshifterApiServiceImpl
 
     $this->_logger->info('[OutshifterApi.saveOrder] Customer created');
 
-    $quote = $this->quoteFactory->create();
-    $quote->setStore($store);
+    $cartId = $this->cartManagement->createEmptyCart();
+    $cart = $this->cartRepository->get($cartId);
+    $cart->setStore($store);
     $customer = $this->customerRepository->getById($customer->getEntityId());
-    $quote->setCurrency();
-    $quote->assignCustomer($customer);
+    $cart->setCurrency();
+    $cart->assignCustomer($customer);
 
     $product = $this->productModel->load(1);
-    $quote->addProduct(
+    $cart->addProduct(
       $product,
       intval(1)
     );
 
     $this->_logger->info('[OutshifterApi.saveOrder] Product added');
 
-    $quote->getBillingAddress()->addData($orderData['shipping_address']);
-    $quote->getShippingAddress()->addData($orderData['shipping_address']);
-    $quote->getShippingAddress()->setCollectShippingRates(true);
-    $quote->getShippingAddress()->setShippingMethod('freeshipping_freeshipping');
+    $cart->getBillingAddress()->addData($orderData['shipping_address']);
+    $cart->getShippingAddress()->addData($orderData['shipping_address']);
+    $cart->getShippingAddress()->setCollectShippingRates(true);
+    $cart->getShippingAddress()->setShippingMethod('freeshipping_freeshipping');
 
     $this->_logger->info('[OutshifterApi.saveOrder] Shipping method setted');
 
-    $quote->setPaymentMethod('checkmo'); //payment method
-    $quote->setInventoryProcessed(false); //not effetc inventory
+    $cart->setPaymentMethod('checkmo'); //payment method
+    $cart->setInventoryProcessed(false); //not effetc inventory
 
     $this->_logger->info('[OutshifterApi.saveOrder] Payment method setted');
-
-    $quote->save(); //Now Save quote and your quote is ready
 
     $this->_logger->info('[OutshifterApi.saveOrder] Quote saved');
 
     // Set Sales Order Payment
-    $quote->getPayment()->importData(['method' => 'checkmo']);
+    $cart->getPayment()->importData(['method' => 'checkmo']);
 
     // Collect Totals & Save Quote
-    $quote->collectTotals()->save();
+    $cart->collectTotals();
 
     $this->_logger->info('[OutshifterApi.saveOrder] Quote prepared');
 
     // Create Order From Quote
-    $order = $this->quoteManagement->submit($quote);
-    $order->setEmailSent(0);
+    $cart->save();
 
     $this->_logger->info('[OutshifterApi.saveOrder] Order created');
 
-    if ($order->getEntityId()) {
-      $result = $order->getRealOrderId();
-    } else {
-      $result = 'Error';
-    }
-    return $result;
+    $cart = $this->cartRepository->get($cart->getId());
+
+    $order_id = $this->cartManagement->placeOrder($cart->getId());
+    return $order_id;
   }
 
   /**
