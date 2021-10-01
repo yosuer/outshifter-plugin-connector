@@ -137,13 +137,12 @@ class OutshifterApiServiceImpl
 
     foreach ($itemsDto as $item) {
       $this->_logger->info('[OutshifterApi.saveOrder] product ' . $item->getProductId() . ', quantity ' . $item->getQuantity());
+      $product = $this->productModel->load($item->getProductId());
+      $cart->addProduct(
+        $product,
+        intval($item->getQuantity())
+      );
     }
-
-    $product = $this->productModel->load(1);
-    $cart->addProduct(
-      $product,
-      intval(1)
-    );
 
     $this->_logger->info('[OutshifterApi.saveOrder] Product added');
 
