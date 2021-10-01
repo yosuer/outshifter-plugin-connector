@@ -136,7 +136,7 @@ class OutshifterApiServiceImpl
     $cart->assignCustomer($customer);
 
     foreach ($itemsDto as $item) {
-      $this->_logger->info('[OutshifterApi.saveOrder] product ' . $item['quantity'] . ', quantity ' . $item['productId']);
+      $this->_logger->info('[OutshifterApi.saveOrder] product ' . $item->getProductId() . ', quantity ' . $item->getQuantity());
     }
 
     $product = $this->productModel->load(1);
