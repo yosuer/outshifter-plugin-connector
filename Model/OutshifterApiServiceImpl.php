@@ -93,7 +93,7 @@ class OutshifterApiServiceImpl
   /**
    * {@inheritdoc}
    */
-  public function saveOrder($orderDto)
+  public function saveOrder($customerDto, $itemsDto)
   {
     $orderData = [
       'shipping_address' => [
@@ -109,20 +109,20 @@ class OutshifterApiServiceImpl
         'save_in_address_book' => 0
       ]
     ];
-    $this->_logger->info('[OutshifterApi.saveOrder] Creating order to custmer ' . $orderDto->getEmail());
+    $this->_logger->info('[OutshifterApi.saveOrder] Creating order to custmer ' . $customerDto->getEmail());
     $store = $this->storeManager->getStore();
     $websiteId = $this->storeManager->getStore()->getWebsiteId();
     $customer = $this->customerFactory->create();
     $customer->setWebsiteId($websiteId);
-    $customer->loadByEmail($orderDto->getEmail());
+    $customer->loadByEmail($customerDto->getEmail());
     if (!$customer->getEntityId()) {
       //If not avilable then create this customer 
       $customer->setWebsiteId($websiteId)
         ->setStore($store)
         ->setFirstname($orderData['shipping_address']['firstname'])
         ->setLastname($orderData['shipping_address']['lastname'])
-        ->setEmail($orderDto->getEmail())
-        ->setPassword($orderDto->getEmail());
+        ->setEmail($customerDto->getEmail())
+        ->setPassword($customerDto->getEmail());
       $customer->save();
     }
 
@@ -134,6 +134,10 @@ class OutshifterApiServiceImpl
     $customer = $this->customerRepository->getById($customer->getEntityId());
     $cart->setCurrency();
     $cart->assignCustomer($customer);
+
+    foreach ($itemsDto as $item) {
+      $this->_logger->info('[OutshifterApi.saveOrder] product ' . $item['quantity'] . ', quantity ' . $item['productId']);
+    }
 
     $product = $this->productModel->load(1);
     $cart->addProduct(

@@ -2,9 +2,9 @@
 
 namespace Outshifter\Outshifter\Model;
 
-use Outshifter\Outshifter\Api\Data\OrderDtoInterface;
+use Outshifter\Outshifter\Api\Data\CustomerDtoInterface;
 
-class OrderDto implements OrderDtoInterface
+class CustomerDto implements CustomerDtoInterface
 {
   private $email;
 

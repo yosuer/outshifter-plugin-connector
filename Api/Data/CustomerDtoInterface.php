@@ -2,7 +2,7 @@
 
 namespace Outshifter\Outshifter\Api\Data;
 
-interface OrderDtoInterface
+interface CustomerDtoInterface
 {
   /**
    * Get the email.

@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
   <preference for="Outshifter\Outshifter\Api\OutshifterApiService" type="Outshifter\Outshifter\Model\OutshifterApiServiceImpl" />
-  <preference for="Outshifter\Outshifter\Api\Data\OrderDtoInterface" type="Outshifter\Outshifter\Model\OrderDto" />
+  <preference for="Outshifter\Outshifter\Api\Data\CustomerDtoInterface" type="Outshifter\Outshifter\Model\CustomerDto" />
+  <preference for="Outshifter\Outshifter\Api\Data\ItemsDtoInterface" type="Outshifter\Outshifter\Model\ItemsDto" />
   <type name="Outshifter\Outshifter\Logger\Handler">
     <arguments>
       <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
