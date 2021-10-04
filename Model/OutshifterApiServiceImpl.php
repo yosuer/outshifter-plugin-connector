@@ -98,11 +98,11 @@ class OutshifterApiServiceImpl
     $orderData = [
       'shipping_address' => [
         'firstname'    => 'jhon', //address Details
-        'lastname'     => 'Deo',
+        'lastname'     => '',
         'street' => 'aaaa',
         'city' => 'Oslo',
-        'country_id' => 'NO',
         'region' => 'Oslo',
+        'country_id' => 'NO',
         'postcode' => '43244',
         'telephone' => '52332',
         'fax' => '32423',
@@ -120,7 +120,7 @@ class OutshifterApiServiceImpl
       $customer->setWebsiteId($websiteId)
         ->setStore($store)
         ->setFirstname($orderData['shipping_address']['firstname'])
-        ->setLastname($orderData['shipping_address']['lastname'])
+        ->setLastname("-")
         ->setEmail($customerDto->getEmail())
         ->setPassword($customerDto->getEmail());
       $customer->save();
