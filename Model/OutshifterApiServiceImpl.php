@@ -10,10 +10,11 @@ use Magento\Catalog\Model\Product;
 use Magento\Quote\Model\QuoteManagement;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\CartManagementInterface;
+use Outshifter\Outshifter\Api\OutshifterApiService;
 use Outshifter\Outshifter\Helper\Utils;
 use Outshifter\Outshifter\Logger\Logger;
 
-class OutshifterApiServiceImpl
+class OutshifterApiServiceImpl implements OutshifterApiService
 {
 
   /**
@@ -95,19 +96,29 @@ class OutshifterApiServiceImpl
    */
   public function saveOrder($customerDto, $itemsDto)
   {
-    $orderData = [
-      'shipping_address' => [
-        'firstname'    => 'jhon', //address Details
-        'lastname'     => '',
-        'street' => 'aaaa',
-        'city' => 'Oslo',
-        'region' => 'Oslo',
-        'country_id' => 'NO',
-        'postcode' => '43244',
-        'telephone' => '52332',
-        'fax' => '32423',
-        'save_in_address_book' => 0
-      ]
+    $billingAddress = [
+      'firstname'    => $customerDto->getBillingName(),
+      'lastname'     => '-',
+      'street' => $customerDto->getBillingStreet(),
+      'city' => $customerDto->getBillingCity(),
+      'region' => $customerDto->getBillingRegion(),
+      'country_id' => $customerDto->getBillingCountry(),
+      'postcode' => $customerDto->getBillingZip(),
+      'telephone' => $customerDto->getBillingPhone(),
+      'fax' => $customerDto->getBillingPhone(),
+      'save_in_address_book' => 0
+    ];
+    $shippingAddress = [
+      'firstname'    => $customerDto->getShippingName(),
+      'lastname'     => '-',
+      'street' => $customerDto->getShippingStreet(),
+      'city' => $customerDto->getShippingCity(),
+      'region' => $customerDto->getShippingRegion(),
+      'country_id' => $customerDto->getShippingCountry(),
+      'postcode' => $customerDto->getShippingZip(),
+      'telephone' => $customerDto->getShippingPhone(),
+      'fax' => $customerDto->getShippingPhone(),
+      'save_in_address_book' => 0
     ];
     $this->_logger->info('[OutshifterApi.saveOrder] Creating order to custmer ' . $customerDto->getEmail());
     $store = $this->storeManager->getStore();
@@ -119,7 +130,7 @@ class OutshifterApiServiceImpl
       //If not avilable then create this customer 
       $customer->setWebsiteId($websiteId)
         ->setStore($store)
-        ->setFirstname($orderData['shipping_address']['firstname'])
+        ->setFirstname($customerDto->getBillingName())
         ->setLastname("-")
         ->setEmail($customerDto->getEmail())
         ->setPassword($customerDto->getEmail());
@@ -146,8 +157,8 @@ class OutshifterApiServiceImpl
 
     $this->_logger->info('[OutshifterApi.saveOrder] Product added');
 
-    $cart->getBillingAddress()->addData($orderData['shipping_address']);
-    $cart->getShippingAddress()->addData($orderData['shipping_address']);
+    $cart->getBillingAddress()->addData($billingAddress);
+    $cart->getShippingAddress()->addData($shippingAddress);
     $cart->getShippingAddress()->setCollectShippingRates(true);
     $cart->getShippingAddress()->setShippingMethod('freeshipping_freeshipping');
 
